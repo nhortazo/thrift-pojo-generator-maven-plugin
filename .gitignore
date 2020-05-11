@@ -1,0 +1,33 @@
+# ------------------------------------------------------------------------------ #
+# Java defaults (https://github.com/github/gitignore/blob/master/Java.gitignore) #
+# ------------------------------------------------------------------------------ #
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# External tool builders
+.externalToolBuilders/
+
+# --------------- #
+# Studio-specific #
+# --------------- #
+target/
+.mule/**
+.mule/**/*
+.mule
+.DS_Store
+.tooling/**
+.tooling/**/*
+.tooling
+.tooling-apps-cache
+.git/**
+.git/**/*
+.tooling-apps-cache/**
+.tooling-apps-cache/**/*
+velocity.log
+
+.idea/**
+.idea/**/*
