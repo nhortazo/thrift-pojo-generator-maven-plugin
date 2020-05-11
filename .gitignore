@@ -31,3 +31,4 @@ velocity.log
 
 .idea/**
 .idea/**/*
+*.iml

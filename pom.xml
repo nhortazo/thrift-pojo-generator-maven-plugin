@@ -7,7 +7,7 @@
 	<groupId>org.disges</groupId>
 	<artifactId>thrift-pojo-generator-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -18,6 +18,12 @@
             <email>sergyp@gmail.com</email>
             <url>https://github.com/sergypv</url>
 		</developer>
+        <developer>
+            <id>nhortazo</id>
+            <name>Nicolas Hortazo</name>
+            <email>nhortazo@gmail.com</email>
+            <url>https://github.com/nhortazo</url>
+        </developer>
 	</developers>
     <licenses>
         <license>
@@ -79,7 +85,7 @@
         <dependency>
             <groupId>org.apache.thrift</groupId>
             <artifactId>libthrift</artifactId>
-            <version>0.9.1</version>
+            <version>0.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -99,20 +105,6 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

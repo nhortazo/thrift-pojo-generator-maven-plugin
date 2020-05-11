@@ -43,11 +43,11 @@ parameterType(param) ::= <<
 >>
 
 remoteResourceParamsWithSeparator(param) ::= <<
-	<remoteResourceParams(param)>,<\ >
+	<remoteResourceParams(param)><\n>
 >>
 
 remoteResourceParams(param) ::= <<
-	<if(param.isPojo || param.isEnumPojo)><bridgeName(param.pojoType)>.getRemoteRepresentation(pojo.get<param.nameUpperCase>())<elseif(param.isGenericMap)>getRemoteMapRepresentation<param.nameUpperCase>(pojo.get<param.nameUpperCase>())<elseif(param.isGenericList)>getRemoteListRepresentation<param.nameUpperCase>(pojo.get<param.nameUpperCase>())<elseif(param.isGenericSet)>getRemoteSetRepresentation<param.nameUpperCase>(pojo.get<param.nameUpperCase>())<else>pojo.get<param.nameUpperCase>()<endif>
+.set<param.nameUpperCase>(<if(param.isPojo || param.isEnumPojo)> pojo.get<param.nameUpperCase>() == null? null : <bridgeName(param.pojoType)>.getRemoteRepresentation(pojo.get<param.nameUpperCase>())<elseif(param.isGenericMap)> pojo.get<param.nameUpperCase>() == null? null : getRemoteMapRepresentation<param.nameUpperCase>(pojo.get<param.nameUpperCase>())<elseif(param.isGenericList)> pojo.get<param.nameUpperCase>() == null? null : getRemoteListRepresentation<param.nameUpperCase>(pojo.get<param.nameUpperCase>())<elseif(param.isGenericSet)> pojo.get<param.nameUpperCase>() == null? null : getRemoteSetRepresentation<param.nameUpperCase>(pojo.get<param.nameUpperCase>())<else>pojo.get<param.nameUpperCase>()<endif>)
 >>
 
 constructorRemoteParameterSetter(param) ::= <<
@@ -127,7 +127,7 @@ enumType(param) ::= <<
 >>
 
 bridgeRemoteParam(param) ::= <<
-<if(param.isPojo || param.isEnumPojo)><bridgeName(param.pojoType)>.getPojoRepresentation(remote.<param.nameLowerCase>)<elseif(param.isGenericMap)>getPojoMapRepresentation<param.nameUpperCase>(remote.<param.nameLowerCase>)<elseif(param.isGenericList)>getPojoListRepresentation<param.nameUpperCase>(remote.<param.nameLowerCase>)<elseif(param.isGenericSet)>getPojoSetRepresentation<param.nameUpperCase>(remote.<param.nameLowerCase>)<else>remote.<param.nameLowerCase><endif>
+<if(param.isPojo || param.isEnumPojo)> remote.<param.nameLowerCase> == null ? null : <bridgeName(param.pojoType)>.getPojoRepresentation(remote.<param.nameLowerCase>)<elseif(param.isGenericMap)> remote.<param.nameLowerCase> == null ? null : getPojoMapRepresentation<param.nameUpperCase>(remote.<param.nameLowerCase>)<elseif(param.isGenericList)> remote.<param.nameLowerCase> == null ? null : getPojoListRepresentation<param.nameUpperCase>(remote.<param.nameLowerCase>)<elseif(param.isGenericSet)> remote.<param.nameLowerCase> == null ? null : getPojoSetRepresentation<param.nameUpperCase>(remote.<param.nameLowerCase>)<else>remote.<param.nameLowerCase><endif>
 >>
 
 bridgeRemoteParamMapFunction(param) ::= <<
@@ -214,11 +214,11 @@ package <packageName>;
 
 public class <bridgeName(pojoEnumName)> {
 	public static <pojoEnumName> getPojoRepresentation(<enumName> type) {
-		return <pojoEnumName>.valueOf(type.name());
+		return type == null? null : <pojoEnumName>.valueOf(type.name());
 	}
 
 	public static <enumName> getRemoteRepresentation(<pojoEnumName> pojoEnum) {
-		return <enumName>.valueOf(pojoEnum.name());
+		return pojoEnum == null? null : <enumName>.valueOf(pojoEnum.name());
 	}
 }
 >>
@@ -233,7 +233,8 @@ public class <bridgeName(pojoClassName)> {
 	}
 
 	public static <remoteClass> getRemoteRepresentation(<pojoClassName> pojo){
-		return new <remoteClass>(<trunc(parameters):remoteResourceParamsWithSeparator()><last(parameters):remoteResourceParams()>);
+		return new <remoteClass>()
+		    <trunc(parameters):remoteResourceParamsWithSeparator()><last(parameters):remoteResourceParams()>;
 	}
 	
 	public static java.util.Set\<<remoteClass>\> getRemoteRepresentationCollection(java.util.Set\<<pojoClassName>\> pojoSet) {

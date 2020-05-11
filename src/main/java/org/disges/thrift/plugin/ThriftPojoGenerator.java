@@ -28,18 +28,18 @@ import org.disges.thrift.plugin.classes.PojoInterface;
  * @phase generate-sources
  */
 public class ThriftPojoGenerator extends AbstractMojo {
-    private static final String TEMPLATES_THRIFT_POJO = "templates/thriftPojo.stg";
-    private static final String THRIFT_CLASS_BASE = "org.apache.thrift.TBase";
-    private static final String THRIFT_CLASS_ENUM = "org.apache.thrift.TEnum";
-    private static final String THRIFT_CLASS_EXCEPTION = "org.apache.thrift.TException";
-    private static final String POJO_CLASS_EXCEPTION = "java.lang.Exception";
-    private static final String POJO_CLASS_MAP = "java.util.Map";
-    public static final String POJO_CLASS_LIST = "java.util.List";
-    public static final String POJO_CLASS_SET = "java.util.Set";
-    private static final String JAVA_EXTENSION = ".java";
-    private static final String POJO_POSTFIX_BRIDGE = "Bridge";
+	private static final String TEMPLATES_THRIFT_POJO = "templates/thriftPojo.stg";
+	private static final String THRIFT_CLASS_BASE = "org.apache.thrift.TBase";
+	private static final String THRIFT_CLASS_ENUM = "org.apache.thrift.TEnum";
+	private static final String THRIFT_CLASS_EXCEPTION = "org.apache.thrift.TException";
+	private static final String POJO_CLASS_EXCEPTION = "java.lang.Exception";
+	private static final String POJO_CLASS_MAP = "java.util.Map";
+	public static final String POJO_CLASS_LIST = "java.util.List";
+	public static final String POJO_CLASS_SET = "java.util.Set";
+	private static final String JAVA_EXTENSION = ".java";
+	private static final String POJO_POSTFIX_BRIDGE = "Bridge";
 
-    /**
+	/**
 	 * @parameter expression="${project}"
 	 * @required
 	 * @readonly
@@ -48,55 +48,55 @@ public class ThriftPojoGenerator extends AbstractMojo {
 	private MavenProject project;
 
 	/**
-     * List of source packages. The content will be parsed recursively
-     *
+	 * List of source packages. The content will be parsed recursively
+	 *
 	 * @parameter
 	 * @required
 	 */
 	private List<String> sources;
 
 	/**
-     * Output directory for the generated Pojos
-     *
+	 * Output directory for the generated Pojos
+	 *
 	 * @parameter default-value="target/generated-sources"
 	 * @required
 	 */
 	private File outputDirectory;
 
 	/**
-     * Generated files need a postfix in order to differenciate from the original ones. Default is "Pojo"
-     *
+	 * Generated files need a postfix in order to differenciate from the original ones. Default is "Pojo"
+	 *
 	 * @parameter default-value="Pojo"
 	 */
 	private String outputPostfix = null;
 
 	/**
-     * All the generated classes will extend this interface (i.e. java.io.Serializable)
-     *
+	 * All the generated classes will extend this interface (i.e. java.io.Serializable)
+	 *
 	 * @parameter
 	 */
 	private String interfaceName = null;
 
 	/**
-     * Package where the generated files will be persisted
-     *
+	 * Package where the generated files will be persisted
+	 *
 	 * @parameter
 	 */
 	private String destinationPackage = null;
 
 	/**
-     * If defined, only classes on those packages will generate pojos
-     *
+	 * If defined, only classes on those packages will generate pojos
+	 *
 	 * @parameter
 	 */
 	private List<String> packageBaseList = null;
 
-    /**
-     * Determine if a Fields enum should be included
-     *
-     * @parameter
-     */
-    private String includeFieldsEnum = "false";
+	/**
+	 * Determine if a Fields enum should be included
+	 *
+	 * @parameter
+	 */
+	private String includeFieldsEnum = "false";
 
 	@Override
 	public void execute() throws MojoExecutionException{
@@ -113,7 +113,7 @@ public class ThriftPojoGenerator extends AbstractMojo {
 			project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
 		} catch (Exception e) {
 			getLog().error("General error", e);
-            throw new MojoExecutionException("Error generatings Pojos", e);
+			throw new MojoExecutionException("Error generatings Pojos", e);
 		}
 	}
 
@@ -153,27 +153,22 @@ public class ThriftPojoGenerator extends AbstractMojo {
 	}
 
 	private PojoClass generateClassBuilderFor(JavaClass javaClass, STGroup template) throws IOException {
-		for (JavaMethod method : javaClass.getMethods()) {
-			if (isAllArgumentsConstructor(javaClass, method)) {
-				PojoClass pojo = new PojoClass(getGeneratedClassPackage(javaClass), getPojoClassName(javaClass.getName()), javaClass.getFullyQualifiedName(),
-						interfaceName, getPojoSuperclass(javaClass), Boolean.parseBoolean(includeFieldsEnum));
-				for (JavaParameter p : method.getParameters()) {
-					if (p.getType().isA(new Type(POJO_CLASS_MAP))) {
-						pojo.addMapParameter(p.getType().toGenericString(), p.getName());
-					} else if(p.getType().isA(new Type(POJO_CLASS_LIST))){
-                        pojo.addListParameter(p.getType().toGenericString(), p.getName());
-                    } else if(p.getType().isA(new Type(POJO_CLASS_SET))){
-                        pojo.addSetParameter(p.getType().toGenericString(), p.getName());
-                    }else {
-						pojo.addParameter(p.getType().toGenericString(), p.getName());
-					}
+		PojoClass pojo = new PojoClass(getGeneratedClassPackage(javaClass), getPojoClassName(javaClass.getName()), javaClass.getFullyQualifiedName(),
+				interfaceName, getPojoSuperclass(javaClass), Boolean.parseBoolean(includeFieldsEnum));
+		for (JavaField f : javaClass.getFields()) {
+			if (f.getModifiers()[0] != null && f.getModifiers()[0].equals("public")) {
+				if (f.getType().isA(new Type(POJO_CLASS_MAP))) {
+					pojo.addMapParameter(f.getType().toGenericString(), f.getName());
+				} else if (f.getType().isA(new Type(POJO_CLASS_LIST))) {
+					pojo.addListParameter(f.getType().toGenericString(), f.getName());
+				} else if (f.getType().isA(new Type(POJO_CLASS_SET))) {
+					pojo.addSetParameter(f.getType().toGenericString(), f.getName());
+				} else {
+					pojo.addParameter(f.getType().toGenericString(), f.getName());
 				}
-
-				return pojo;
 			}
 		}
-
-		return null;
+		return pojo;
 	}
 
 	private String getPojoSuperclass(JavaClass javaClass) {
@@ -244,39 +239,39 @@ public class ThriftPojoGenerator extends AbstractMojo {
 		return method.isConstructor()
 				&& method.getParameters().length > 0
 				&& !(method.getParameters().length == 1 && method.getParameters()[0].getType().getFullyQualifiedName()
-						.equals(javaClass.getFullyQualifiedName()));
+				.equals(javaClass.getFullyQualifiedName()));
 	}
 
-    // Setters for testing purposes
-    protected void setProject(MavenProject project) {
-        this.project = project;
-    }
+	// Setters for testing purposes
+	protected void setProject(MavenProject project) {
+		this.project = project;
+	}
 
-    protected void setSources(List<String> sources) {
-        this.sources = sources;
-    }
+	protected void setSources(List<String> sources) {
+		this.sources = sources;
+	}
 
-    protected void setOutputPostfix(String outputPostfix) {
-        this.outputPostfix = outputPostfix;
-    }
+	protected void setOutputPostfix(String outputPostfix) {
+		this.outputPostfix = outputPostfix;
+	}
 
-    protected void setInterfaceName(String interfaceName) {
-        this.interfaceName = interfaceName;
-    }
+	protected void setInterfaceName(String interfaceName) {
+		this.interfaceName = interfaceName;
+	}
 
-    protected void setDestinationPackage(String destinationPackage) {
-        this.destinationPackage = destinationPackage;
-    }
+	protected void setDestinationPackage(String destinationPackage) {
+		this.destinationPackage = destinationPackage;
+	}
 
-    protected void setPackageBaseList(List<String> packageBaseList) {
-        this.packageBaseList = packageBaseList;
-    }
+	protected void setPackageBaseList(List<String> packageBaseList) {
+		this.packageBaseList = packageBaseList;
+	}
 
-    public void setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
 
-    public void setIncludeFieldsEnum(String includeFieldsEnum) {
-        this.includeFieldsEnum = includeFieldsEnum;
-    }
+	public void setIncludeFieldsEnum(String includeFieldsEnum) {
+		this.includeFieldsEnum = includeFieldsEnum;
+	}
 }
